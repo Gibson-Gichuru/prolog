@@ -99,3 +99,23 @@ func (i *index) Read(in int64) (out uint32, pos uint64, err error) {
 	pos = enc.Uint64(i.mmap[pos+offWidth : pos+endWidth])
 	return out, pos, nil
 }
+
+// Write appends the given `off` and `pos` to the index.
+//
+// It returns an error if the index is full.
+func (i *index) Write(off uint32, pos uint64) error {
+
+	if uint64(len(i.mmap)) < i.size+endWidth {
+		return io.EOF
+	}
+
+	enc.PutUint32(i.mmap[i.size:i.size+offWidth], off)
+	enc.PutUint64(i.mmap[i.size+offWidth:i.size+endWidth], pos)
+	i.size += endWidth
+	return nil
+}
+
+// Name returns the name of the file associated with the index.
+func (i *index) Name() string {
+	return i.file.Name()
+}
