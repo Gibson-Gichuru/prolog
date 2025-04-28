@@ -32,6 +32,8 @@ func (c *Log) Append(record Record) (uint64, error) {
 	return record.Offset, nil
 }
 
+// Read reads a record from the log at the given offset. It returns the record
+// and an error if the offset is out of bounds.
 func (c *Log) Read(offset uint64) (Record, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

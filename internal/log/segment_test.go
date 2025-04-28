@@ -9,7 +9,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSegmant(t *testing.T) {
+// TestSegment exercises the Segment type.
+//
+// It creates a new segment and writes some records to it. It verifies that the
+// next offset is correct and that the record is successfully written and read
+// back. It also verifies that maxing out the index or store causes the
+// Append method to return an error. It also verifies that removing the segment
+// works correctly.
+func TestSegment(t *testing.T) {
 
 	dir, _ := os.MkdirTemp("", "segment_test")
 	defer os.RemoveAll(dir)
