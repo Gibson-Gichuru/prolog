@@ -15,7 +15,7 @@ const (
 	lenWidth = 8
 )
 
-type Store struct {
+type store struct {
 	*os.File
 	mu   sync.Mutex
 	buf  *bufio.Writer
@@ -25,7 +25,7 @@ type Store struct {
 // newStore creates a new log.Store from a given file, using the current
 // size of the file as the log's size. It returns a pointer to the new
 // Store and an error, if any.
-func newStore(file *os.File) (*Store, error) {
+func newStore(file *os.File) (*store, error) {
 
 	fi, err := os.Stat(file.Name())
 
@@ -35,7 +35,7 @@ func newStore(file *os.File) (*Store, error) {
 
 	size := uint64(fi.Size())
 
-	return &Store{
+	return &store{
 		File: file,
 		size: size,
 		buf:  bufio.NewWriter(file),
@@ -45,7 +45,7 @@ func newStore(file *os.File) (*Store, error) {
 // Append writes the record to the log, first writing the length of the record
 // encoded in `lenWidth` bytes, then the record itself. It returns the number of
 // bytes written, the position of the record, and any error.
-func (s *Store) Append(p []byte) (n uint64, pos uint64, err error) {
+func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -71,7 +71,7 @@ func (s *Store) Append(p []byte) (n uint64, pos uint64, err error) {
 // Read retrieves a record from the log at the given position. It first reads
 // the length of the record, then reads the record itself. It returns the
 // record as a byte slice and any error encountered.
-func (s *Store) Read(pos uint64) ([]byte, error) {
+func (s *store) Read(pos uint64) ([]byte, error) {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -97,7 +97,7 @@ func (s *Store) Read(pos uint64) ([]byte, error) {
 
 // ReadAt reads from the log at the given offset, and writes the result into
 // p. It returns the number of bytes read and any error encountered.
-func (s *Store) ReadAt(p []byte, off int64) (int, error) {
+func (s *store) ReadAt(p []byte, off int64) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -111,7 +111,7 @@ func (s *Store) ReadAt(p []byte, off int64) (int, error) {
 // Close flushes the buffer and closes the underlying file. It is safe to
 // call multiple times. It returns any error encountered during the close
 // operation.
-func (s *Store) Close() error {
+func (s *store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

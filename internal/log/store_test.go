@@ -63,7 +63,7 @@ func TestStoreClose(t *testing.T) {
 //
 // It writes 4 records to the store, and verifies that the position
 // returned by Append is correct.
-func testAppend(t *testing.T, s *Store) {
+func testAppend(t *testing.T, s *store) {
 	t.Helper()
 	for i := uint64(1); i < 4; i++ {
 		n, pos, err := s.Append(write)
@@ -76,7 +76,7 @@ func testAppend(t *testing.T, s *Store) {
 //
 // It reads 3 records from the store, and verifies that the data
 // returned matches the data written.
-func testRead(t *testing.T, s *Store) {
+func testRead(t *testing.T, s *store) {
 	t.Helper()
 	var pos uint64
 
@@ -94,7 +94,7 @@ func testRead(t *testing.T, s *Store) {
 // validating that the size of the record and the data
 // returned matches the data written. It verifies that the
 // number of bytes read and the content are correct.
-func testReadAt(t *testing.T, s *Store) {
+func testReadAt(t *testing.T, s *store) {
 	t.Helper()
 
 	for i, off := uint64(1), int64(0); i < 4; i++ {
