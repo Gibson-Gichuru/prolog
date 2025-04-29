@@ -12,6 +12,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TestServer runs a series of test scenarios to verify the functionality
+// of the server's Produce, Consume, and streaming RPC methods. It sets up
+// a client-server environment with a temporary log and executes each test
+// scenario, ensuring that records can be correctly produced and consumed,
+// streamed without errors, and that appropriate errors are returned when
+// consuming past the log boundary.
 func TestServer(t *testing.T) {
 	for scenario, fn := range map[string]func(t *testing.T, client api.LogClient, config *Config){
 		"produce/consume a message to/from the log succeeds": testProduceConsume,
