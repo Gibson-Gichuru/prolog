@@ -19,7 +19,7 @@ jobs:
                 cache: true
                 cache-dependency-path: go.mod
             - name: Install dependencies
-              run: go mod download
+              run: go mod tidy
 
             - name: Compile grpc
               run: make compile
@@ -29,6 +29,6 @@ jobs:
 
             - name: generarar certificates
               run: make gencert
-              
+
             - name: Run tests
               run: make test
