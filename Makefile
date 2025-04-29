@@ -1,4 +1,4 @@
-CONFIG_PATH=${HOME}/ .prolog/
+CONFIG_PATH=${HOME}/.prolog/
 
 .PHONY: init
 init:
