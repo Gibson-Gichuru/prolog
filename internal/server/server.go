@@ -4,6 +4,7 @@ import (
 	"context"
 
 	api "github.com/Gibson-Gichuru/prolog/api/v1"
+	"google.golang.org/grpc"
 )
 
 type Config struct {
@@ -114,4 +115,19 @@ func (s *grpcServer) ConsumeStream(
 			req.Offset++
 		}
 	}
+}
+
+// NewGRPCServer returns a new gRPC server that wraps the given CommitLog.
+// It registers the server with the gRPC API and returns the gRPC server and
+// an error if any.
+func NewGRPCServer(config *Config) (*grpc.Server, error) {
+	gsrv := grpc.NewServer()
+
+	srv, err := newgrpcServer(config)
+	if err != nil {
+		return nil, err
+	}
+	api.RegisterLogServer(gsrv, srv)
+
+	return gsrv, nil
 }
