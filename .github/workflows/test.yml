@@ -20,11 +20,7 @@ jobs:
                 cache-dependency-path: go.mod
             - name: Install dependencies
               run: go mod tidy
-            - name: Install protoc
-              run: sudo apt install protobuf-compiler
-            - name: Compile grpc
-              run: make compile
-
+      
             - name: Initialize Cert Directory
               run: make init
 
