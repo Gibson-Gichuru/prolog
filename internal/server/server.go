@@ -120,8 +120,8 @@ func (s *grpcServer) ConsumeStream(
 // NewGRPCServer returns a new gRPC server that wraps the given CommitLog.
 // It registers the server with the gRPC API and returns the gRPC server and
 // an error if any.
-func NewGRPCServer(config *Config) (*grpc.Server, error) {
-	gsrv := grpc.NewServer()
+func NewGRPCServer(config *Config, opts ...grpc.ServerOption) (*grpc.Server, error) {
+	gsrv := grpc.NewServer(opts...)
 
 	srv, err := newgrpcServer(config)
 	if err != nil {

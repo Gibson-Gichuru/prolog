@@ -1,0 +1,17 @@
+{
+    "CN":"client",
+    "hosts":[""],
+    "key":{
+        "algo":"rsa",
+        "size":2048
+    },
+    "names":[
+        {
+            "C":"KE",
+            "L":"NBO",
+            "ST":"Nairobi",
+            "O":"Prolog Test",
+            "OU":"CA Services"
+        }
+    ]
+}
