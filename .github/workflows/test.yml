@@ -20,7 +20,8 @@ jobs:
                 cache-dependency-path: go.mod
             - name: Install dependencies
               run: go mod tidy
-
+            - name: configure go path
+              run: go env -w GOPATH=$(go env GOPATH)
             - name: Compile grpc
               run: make compile
 
