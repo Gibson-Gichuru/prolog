@@ -1,2 +1,2 @@
-p, root, *, produce, allow
-p, root, *, consume, allow
+p, root, *, produce
+p, root, *, consume

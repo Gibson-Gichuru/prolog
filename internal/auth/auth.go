@@ -3,7 +3,7 @@ package auth
 import (
 	"fmt"
 
-	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -16,7 +16,11 @@ type Authorizer struct {
 // initialized using the provided model and policy files. It returns
 // a pointer to the created Authorizer.
 func New(model, policy string) *Authorizer {
-	enforcer := casbin.NewEnforcer(model, policy)
+	enforcer, err := casbin.NewEnforcer(model, policy)
+
+	if err != nil {
+		panic(err)
+	}
 	return &Authorizer{
 		enforcer: enforcer,
 	}
@@ -27,7 +31,7 @@ func New(model, policy string) *Authorizer {
 // the subject does not have the specified permission.
 func (a *Authorizer) Authorize(subject, object, action string) error {
 
-	if !a.enforcer.Enforce(subject, object, action) {
+	if ok, err := a.enforcer.Enforce(subject, object, action); err != nil || !ok {
 		msg := fmt.Sprintf(
 			"%s not permitted to %s to %s",
 			subject,

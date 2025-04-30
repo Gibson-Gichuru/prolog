@@ -5,6 +5,7 @@ import (
 
 	api "github.com/Gibson-Gichuru/prolog/api/v1"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

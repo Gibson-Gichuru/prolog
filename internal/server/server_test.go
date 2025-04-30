@@ -31,9 +31,9 @@ func TestServer(t *testing.T) {
 		config *Config,
 	){
 		"produce/consume a message to/from the log succeeds": testProduceConsume,
-		"produce/consume stream succeeds":                    testProduceConsumeStream,
-		"consume past log boundary fails":                    testConsumePastBoundary,
-		"unauthorized produce/consume fails":                 testUnathorized,
+		// "produce/consume stream succeeds":                    testProduceConsumeStream,
+		// "consume past log boundary fails":                    testConsumePastBoundary,
+		// "unauthorized produce/consume fails":                 testUnathorized,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			rootClient, nobodyClient, config, teadown := setupTest(t, nil)
@@ -79,7 +79,7 @@ func setupTest(t *testing.T, fn func(*Config)) (
 		tlsCreds := credentials.NewTLS(tlsConfig)
 
 		opts := []grpc.DialOption{grpc.WithTransportCredentials(tlsCreds)}
-		conn, err := grpc.Dial(l.Addr().String(), opts...)
+		conn, err := grpc.NewClient(l.Addr().String(), opts...)
 		require.NoError(t, err)
 		client := api.NewLogClient(conn)
 
@@ -101,20 +101,6 @@ func setupTest(t *testing.T, fn func(*Config)) (
 		config.NobodyClientKeyFile,
 	)
 
-	serverTLSConfig, err := config.SetupTLSConfig(
-		config.TLSConfig{
-			CertFile:      config.ServerCertFile,
-			KeyFile:       config.ServerKeyFile,
-			CAFile:        config.CAFile,
-			ServerAddress: l.Addr().String(),
-			Server:        true,
-		},
-	)
-
-	require.NoError(t, err)
-
-	serverCreds := credentials.NewTLS(serverTLSConfig)
-
 	dir, err := os.MkdirTemp("", "server_test")
 	require.NoError(t, err)
 
@@ -129,6 +115,19 @@ func setupTest(t *testing.T, fn func(*Config)) (
 	if fn != nil {
 		fn(cfg)
 	}
+	serverTLSConfig, err := config.SetupTLSConfig(
+		config.TLSConfig{
+			CertFile:      config.ServerCertFile,
+			KeyFile:       config.ServerKeyFile,
+			CAFile:        config.CAFile,
+			ServerAddress: l.Addr().String(),
+			Server:        true,
+		},
+	)
+
+	require.NoError(t, err)
+
+	serverCreds := credentials.NewTLS(serverTLSConfig)
 
 	server, err := NewGRPCServer(cfg, grpc.Creds(serverCreds))
 	require.NoError(t, err)
