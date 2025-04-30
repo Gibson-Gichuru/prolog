@@ -1,14 +1,10 @@
-CONFIG_PATH=${HOME}/.prolog/
-
-$(CONFIG_PATH)/model.conf:
-	cp utils/model.conf ${CONFIG_PATH}/model.conf
-
-${CONFIG_PATH}/policy.csv:
-	cp utils/policy.csv ${CONFIG_PATH}/policy.csv
+CONFIG_PATH := ${HOME}/.prolog/
 
 .PHONY: init
 init:
 	mkdir -p ${CONFIG_PATH}
+	cp -f utils/model.conf ${CONFIG_PATH}/model.conf
+	cp -f utils/policy.csv ${CONFIG_PATH}/policy.csv
 
 .PHONY: gencert
 gencert:
@@ -38,11 +34,10 @@ gencert:
 		-cn="nobody" \
 		utils/client-csr.json | cfssljson -bare nobody-client
 
-	
 	mv *.pem *.csr ${CONFIG_PATH}
 
 .PHONY: test
-test: ${CONFIG_PATH}/model.conf ${CONFIG_PATH}/policy.csv
+test: init
 	go test -race ./...
 
 .PHONY: compile
