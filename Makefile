@@ -1,5 +1,11 @@
 CONFIG_PATH=${HOME}/.prolog/
 
+$(CONFIG_PATH)/model.conf:
+	cp utils/model.conf ${CONFIG_PATH}/model.conf
+
+${CONFIG_PATH}/policy.csv:
+	cp utils/policy.csv ${CONFIG_PATH}/policy.csv
+
 .PHONY: init
 init:
 	mkdir -p ${CONFIG_PATH}
@@ -21,11 +27,22 @@ gencert:
 		-ca-key=ca-key.pem \
 		-config utils/ca-config.json \
 		-profile client \
-		utils/client-csr.json | cfssljson -bare client
+		-cn="root" \
+		utils/client-csr.json | cfssljson -bare root-client
+
+	cfssl gencert \
+		-ca ca.pem \
+		-ca-key=ca-key.pem \
+		-config utils/ca-config.json \
+		-profile client \
+		-cn="nobody" \
+		utils/client-csr.json | cfssljson -bare nobody-client
+
+	
 	mv *.pem *.csr ${CONFIG_PATH}
 
 .PHONY: test
-test:
+test: ${CONFIG_PATH}/model.conf ${CONFIG_PATH}/policy.csv
 	go test -race ./...
 
 .PHONY: compile
