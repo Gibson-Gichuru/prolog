@@ -2,20 +2,41 @@ package server
 
 import (
 	"context"
+	"flag"
 	"net"
 	"os"
 	"testing"
+	"time"
 
 	api "github.com/Gibson-Gichuru/prolog/api/v1"
 	"github.com/Gibson-Gichuru/prolog/internal/auth"
 	"github.com/Gibson-Gichuru/prolog/internal/config"
 	"github.com/Gibson-Gichuru/prolog/internal/log"
 	"github.com/stretchr/testify/require"
+	"go.opencensus.io/examples/exporter"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 )
+
+var debug = flag.Bool("debug", false, "Enable verbose debug logging")
+
+func TestMain(m *testing.M) {
+	flag.Parse()
+
+	if *debug {
+		logger, err := zap.NewDevelopment()
+
+		if err != nil {
+			panic(err)
+		}
+		zap.ReplaceGlobals(logger)
+	}
+
+	os.Exit(m.Run())
+}
 
 // TestServer runs a series of test scenarios to verify the functionality
 // of the server's Produce, Consume, and streaming RPC methods. It sets up
@@ -107,6 +128,32 @@ func setupTest(t *testing.T, fn func(*Config)) (
 	clog, err := log.NewLog(dir, log.Config{})
 	require.NoError(t, err)
 	authorizer := auth.New(config.ACLModelFile, config.ACLPolicyFile)
+
+	var telemetryExporter *exporter.LogExporter
+
+	if *debug {
+		metricsLogFile, err := os.CreateTemp("", "metrics-*.log")
+
+		require.NoError(t, err)
+		t.Logf("metrics log file: %s", metricsLogFile.Name())
+		traceLogFile, err := os.CreateTemp("", "traces-*.log")
+		require.NoError(t, err)
+
+		t.Logf("trace log file: %s", traceLogFile.Name())
+
+		telemetryExporter, err = exporter.NewLogExporter(
+			exporter.Options{
+				MetricsLogFile:    metricsLogFile.Name(),
+				TracesLogFile:     traceLogFile.Name(),
+				ReportingInterval: time.Second,
+			},
+		)
+
+		require.NoError(t, err)
+		err = telemetryExporter.Start()
+		require.NoError(t, err)
+	}
+
 	cfg = &Config{
 		CommitLog:  clog,
 		Authorizer: authorizer,
@@ -142,6 +189,11 @@ func setupTest(t *testing.T, fn func(*Config)) (
 		nobodyConn.Close()
 		l.Close()
 		os.RemoveAll(dir)
+		if telemetryExporter != nil {
+			time.Sleep(1500 * time.Millisecond)
+			telemetryExporter.Stop()
+			telemetryExporter.Close()
+		}
 	}
 
 }
