@@ -52,9 +52,9 @@ func TestServer(t *testing.T) {
 		config *Config,
 	){
 		"produce/consume a message to/from the log succeeds": testProduceConsume,
-		// "produce/consume stream succeeds":                    testProduceConsumeStream,
-		// "consume past log boundary fails":                    testConsumePastBoundary,
-		// "unauthorized produce/consume fails":                 testUnathorized,
+		"produce/consume stream succeeds":                    testProduceConsumeStream,
+		"consume past log boundary fails":                    testConsumePastBoundary,
+		"unauthorized produce/consume fails":                 testUnathorized,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			rootClient, nobodyClient, config, teadown := setupTest(t, nil)
