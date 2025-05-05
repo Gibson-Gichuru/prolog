@@ -38,7 +38,7 @@ gencert:
 
 .PHONY: test
 test: init
-	go test -race ./...
+	go test -v -race ./...
 
 .PHONY: compile
 compile:
