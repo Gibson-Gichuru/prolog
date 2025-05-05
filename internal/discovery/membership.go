@@ -141,7 +141,7 @@ func (m *MemberShip) isLocal(member serf.Member) bool {
 func (m *MemberShip) handleJoin(member serf.Member) {
 	if err := m.handler.Join(
 		member.Name,
-		member.Tags["rcp_addr"],
+		member.Tags["rpc_addr"],
 	); err != nil {
 		m.logError(err, "failed to join", member)
 	}
